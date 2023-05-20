@@ -105,6 +105,7 @@ class MessageReceiver(object):
             final_medoids = kmedoids_instance.get_medoids()
             self.labelsss = kmedoids_instance.get_clusters()
             self.inertia=inertia
+            print(inertia)
             
             # no updates between two clients
             if(final_medoids==self.medoids):
@@ -113,7 +114,7 @@ class MessageReceiver(object):
                 for j in range(2):
                     for i in range(len(self.labelsss[j])):
                         labelss[self.labelsss[j][i]]=j
-                nmi_score = normalized_mutual_info_score(self.trues, labelss)
+                nmi_score = normalized_mutual_info_score(self.labels, labelss)
                 print(nmi_score)
                 if(self.resultFromClient==7):
                     self.convergenve=True

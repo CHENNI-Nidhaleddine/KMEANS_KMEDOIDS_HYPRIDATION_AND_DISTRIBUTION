@@ -15,7 +15,7 @@ import numpy as np;
 
 # Retrieve the server URI from the server machine
 # server_uri = input("Enter the server URI: ")
-server_uri= "PYRO:obj_098c4eb72d0b4d2b9cf08a660869ff02@localhost:53017"
+server_uri= "PYRO:obj_69f5a5249ee34edbae2703ee713b5390@localhost:53058"
 
 # Generate a unique ID for this client
 client_id = str(uuid.uuid4())
