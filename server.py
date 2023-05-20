@@ -24,6 +24,7 @@ class MessageReceiver(object):
         self.convergenve=False
         self.data=[]
         self.labels=[]
+        self.trues=[]
         self.n_clusters=0
         self.featuresSize=0
         self.medoids=[]
@@ -67,6 +68,8 @@ class MessageReceiver(object):
     
     def setLabels(self,labels):
         self.labels=labels
+    def setTrues(self,labels):
+        self.trues=labels
     
     def setFeaturesSize(self,s):
         self.featuresSize=s
@@ -95,47 +98,29 @@ class MessageReceiver(object):
         if(inertia<self.inertia):
             self.labels=np.array(labels)
             medoids=get_medoid_indices(self.data, self.labels)
-            kmedoids_instance = kmedoids(self.data, medoids,k=self.n_clusters,max_iter=1)
+            kmedoids_instance = kmedoids(self.data, medoids,k=self.n_clusters,max_iter=3)
             kmedoids_instance.process()
 
             # Get the final medoids and cluster assignments
             final_medoids = kmedoids_instance.get_medoids()
             self.labelsss = kmedoids_instance.get_clusters()
             self.inertia=inertia
-            print(inertia)
             
             # no updates between two clients
-            # if(final_medoids==self.medoids):
-            #     self.resultFromClient=self.resultFromClient+1
-            #     labelss=[0]*569
-            #     for j in range(2):
-            #         for i in range(len(self.labelsss[j])):
-            #             labelss[self.labelsss[j][i]]=j
-            #     nmi_score = normalized_mutual_info_score(self.labels, labelss)
-            #     print(nmi_score)
-            #     if(self.resultFromClient==3):
-            #         self.convergenve=True
+            if(final_medoids==self.medoids):
+                self.resultFromClient=self.resultFromClient+1
+                labelss=[0]*569
+                for j in range(2):
+                    for i in range(len(self.labelsss[j])):
+                        labelss[self.labelsss[j][i]]=j
+                nmi_score = normalized_mutual_info_score(self.trues, labelss)
+                print(nmi_score)
+                if(self.resultFromClient==7):
+                    self.convergenve=True
 
 
             self.medoids=final_medoids
         
-        elif(inertia==self.inertia):
-            self.resultFromClient=self.resultFromClient+1
-            if(self.resultFromClient==3):
-                receiver.end=time.time()
-                self.convergenve=True # to stop clients
-                print("time: ",self.end-self.start)
-
-
-            labelss=[0]*self.data.shape[0]
-            for j in range(self.n_clusters):
-                for i in range(len(self.labelsss[j])):
-                    labelss[self.labelsss[j][i]]=j
-            nmi_score = normalized_mutual_info_score(self.labels, labelss)
-            print(nmi_score)
-            
-
-
     @Pyro4.expose
     def getConvergence(self):
         return self.convergenve
@@ -190,6 +175,7 @@ data = pd.read_csv("data.csv")
 receiver.setData(data.values[:,2:])
 # print(receiver.data)
 # print("--------------")
+receiver.setTrues(data.values[:,1])
 receiver.setLabels(data.values[:,1])
 # print(receiver.labels)
 receiver.setK(2)
@@ -199,35 +185,11 @@ uri = daemon.register(receiver)
 
 # Print the URI for the clients to connect
 print("Server URI:", uri)
+def calculate_inertia(labels, data):
+    kmeans = KMeans(n_clusters=len(set(labels)))
+    kmeans.fit(data)
+    inertia = kmeans.inertia_
+    return inertia
 
-#test for kmeans and kmedoid
-receiver.start=time.time()
-# kmeans = KMeans(n_clusters=2,max_iter=100000)
-# kmeans.fit(receiver.data)
-# receiver.labelsss=kmeans.labels_
-# centers= kmeans.cluster_centers_
-# inertia=kmeans.inertia_
-# nmi_score = normalized_mutual_info_score(receiver.labels, receiver.labelsss)
-# print("nmi kmeans: ",nmi_score)
-# receiver.end=time.time()
-# print("time kmeans: ",receiver.end-receiver.start)
-# receiver.start=time.time()
-
-# kmedoids_instance = kmedoids(receiver.data,[80,255],k=2,max_iter=1000000)
-# kmedoids_instance.process()
-
-#             # Get the final medoids and cluster assignments
-# final_medoids = kmedoids_instance.get_medoids()
-# receiver.labelsss = kmedoids_instance.get_clusters()
-# receiver.inertia=inertia
-# labelss=[0]*receiver.data.shape[0]
-# for j in range(receiver.n_clusters):
-#     for i in range(len(receiver.labelsss[j])):
-#         labelss[receiver.labelsss[j][i]]=j
-# nmi_score = normalized_mutual_info_score(receiver.labels, labelss)
-# # print(nmi_score)
-# receiver.end=time.time()
-# print("nmi kmedoids:",nmi_score)
-# print("time kmedoids: ",receiver.end-receiver.start)
 # Start the Pyro event loop
 daemon.requestLoop()
