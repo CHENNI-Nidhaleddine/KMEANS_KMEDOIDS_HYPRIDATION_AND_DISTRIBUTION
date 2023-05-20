@@ -105,7 +105,7 @@ class MessageReceiver(object):
             final_medoids = kmedoids_instance.get_medoids()
             self.labelsss = kmedoids_instance.get_clusters()
             self.inertia=inertia
-            print(inertia)
+            
             
             # no updates between two clients
             if(final_medoids==self.medoids):
