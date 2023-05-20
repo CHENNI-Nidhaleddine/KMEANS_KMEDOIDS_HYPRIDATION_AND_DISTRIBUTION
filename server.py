@@ -98,7 +98,7 @@ class MessageReceiver(object):
         if(inertia<self.inertia):
             self.labels=np.array(labels)
             medoids=get_medoid_indices(self.data, self.labels)
-            kmedoids_instance = kmedoids(self.data, medoids,k=self.n_clusters,max_iter=3)
+            kmedoids_instance = kmedoids(self.data, medoids,k=self.n_clusters,max_iter=8)
             kmedoids_instance.process()
 
             # Get the final medoids and cluster assignments
@@ -114,9 +114,9 @@ class MessageReceiver(object):
                 for j in range(2):
                     for i in range(len(self.labelsss[j])):
                         labelss[self.labelsss[j][i]]=j
-                nmi_score = normalized_mutual_info_score(self.labels, labelss)
+                nmi_score = normalized_mutual_info_score(self.treus, labelss)
                 print(nmi_score)
-                if(self.resultFromClient==7):
+                if(self.resultFromClient==70):
                     self.convergenve=True
 
 

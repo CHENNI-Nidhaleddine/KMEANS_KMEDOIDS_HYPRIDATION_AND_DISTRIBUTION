@@ -15,7 +15,7 @@ import numpy as np;
 
 # Retrieve the server URI from the server machine
 # server_uri = input("Enter the server URI: ")
-server_uri= "PYRO:obj_69f5a5249ee34edbae2703ee713b5390@localhost:53058"
+server_uri= "PYRO:obj_f24a220fb31c4c12ac71894327698b45@localhost:53314"
 
 # Generate a unique ID for this client
 client_id = str(uuid.uuid4())
@@ -34,7 +34,8 @@ centers=X[np.random.choice(range(len(X)), size=k, replace=False)]
 
 #get data
 while(not receiver.getConvergence()):
-    kmeans = KMeans(n_clusters=k,init=np.array(centers),max_iter=1)
+    centers=X[np.random.choice(range(len(X)), size=k, replace=False)]
+    kmeans = KMeans(n_clusters=k,init=np.array(centers),max_iter=30)
     kmeans.fit(X)
     labels=kmeans.labels_
     centers= kmeans.cluster_centers_
