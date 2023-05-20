@@ -114,7 +114,7 @@ class MessageReceiver(object):
                 for j in range(2):
                     for i in range(len(self.labelsss[j])):
                         labelss[self.labelsss[j][i]]=j
-                nmi_score = normalized_mutual_info_score(self.treus, labelss)
+                nmi_score = normalized_mutual_info_score(self.labels, labelss)
                 print(nmi_score)
                 if(self.resultFromClient==70):
                     self.convergenve=True
